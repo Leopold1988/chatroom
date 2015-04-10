@@ -1,0 +1,76 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+ul, ol{
+  margin: 0;
+  padding: 10px;
+}
+
+ul li{
+  list-style-type: none;
+  margin-bottom: 8px;
+}
+
+ol li{
+  list-style-type: none;
+}
+
+ul li em{
+  font-style: normal;
+  font-weight: bold;
+  color: #0039CB;
+}
+
+a {
+  color: #00B7FF;
+}
+
+#l{
+  display: block;
+}
+
+#d{
+  display: none;
+  width: 1000px;
+  margin: 100px auto;
+}
+
+#count{
+  margin: 10px 0;
+}
+
+#count span{
+  color: red;
+  font-weight: bold;
+}
+
+.main{
+  height: 300px;
+  width: 100%;
+  overflow: hidden;
+}
+
+#message{
+  float: left;
+  margin-right: 20px;
+  height: 298px;
+  width: 778px;
+  overflow: auto;
+  border: 1px solid #ccc;
+  background-color: #f6f6f6;
+}
+
+#userlist{
+  float: left;
+  height: 298px;
+  width: 198px;
+  overflow: auto;
+  border: 1px solid #ccc;
+  background-color: #f6f6f6;
+}
+
+#send{
+  margin: 10px 0;
+}

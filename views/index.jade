@@ -1,0 +1,75 @@
+extends layout
+
+block content
+  #l
+    #login
+      input(type="text", value="", placeholder="请输入昵称")
+      input(type="button", value="使用")
+  #d
+    #count
+      | 在线人数
+      span -
+      | 人
+    .main
+      #message
+        ul
+      #userlist
+        ol
+    #send
+      input(type="text", value="", placeholder="请输入信息")
+      input(type="button", value="提交")
+  script.
+    var socket = io.connect('http://127.0.0.1:3000');
+    var countobj, showobj, logintext, loginbtn, messagetext, messagebtn;
+
+    function dologin(){
+      logintext = document.getElementById("login").getElementsByTagName("input")[0];
+      loginbtn = document.getElementById("login").getElementsByTagName("input")[1];
+
+      loginbtn.onclick = function(){
+        socket.emit("login", logintext.value, function (boolean) {
+          if (boolean) {
+            document.getElementById("l").style.display = "none";
+            document.getElementById("d").style.display = "block";
+            domessage();
+          } else {
+            alert("用户名已经存在");
+          }
+        });
+      };
+    }
+
+    function domessage(){
+      countobj = document.getElementById("count").getElementsByTagName("span")[0];
+      showobj = document.getElementById("message").getElementsByTagName("ul")[0];
+      userlist = document.getElementById("userlist").getElementsByTagName("ol")[0];
+      messagetext = document.getElementById("send").getElementsByTagName("input")[0];
+      messagebtn = document.getElementById("send").getElementsByTagName("input")[1];
+
+      messagebtn.onclick = function(){
+        socket.emit("to server", { message : messagetext.value });
+        messagetext.value = "";
+        return false;
+      };
+
+      socket.on('user', function (data) {
+        var length = data.count.length,
+            listhtml = "";
+
+        countobj.innerHTML = length;
+        for (var i = 0; i < length; i++) {
+          listhtml += "<li>" + data.count[i] + "</li>"
+        }
+
+        userlist.innerHTML = listhtml;
+      });
+
+      socket.on('to broswer', function (data) {
+        showobj.innerHTML += "<li>" +
+          "<div><em>" + data.username + ":</em></div>" +
+          "<div>" + data.message + "</div>" +
+        "</li>";
+      });
+    }
+
+    dologin();
