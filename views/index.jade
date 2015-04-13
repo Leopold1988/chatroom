@@ -1,109 +1,36 @@
 extends layout
 
 block content
-  #l
-    #login
-      input(type="text", value="", placeholder="请输入昵称")
-      input(type="button", value="使用")
-  #d
-    #count
-      | 在线人数
-      span -
-      | 人
-    .main
-      #message
-        .l
-          ul
-      #userlist
-        ol
-    #send
-      input(type="text", value="", placeholder="请输入信息")
-      input(type="button", value="提交")
-  script.
-    var socket = io.connect('http://' + window.location.hostname + ':3000');
-    var countobj, showobj, logintext, userlist, loginbtn, messagetext, messagebtn;
+  .container
+    .row
+      .col-xs-12.col-sm-12.col-md-12
+          #l
+            .jumbotron
+              h1 欢迎XXX聊天室
+              p 这是一个测试中的聊天室。
+            #login
+              input(type="text", value="", placeholder="请输入昵称")
+              input(type="button", value="使用")
+    .row.main#d
+      .col-xs-12.col-sm-12.col-md-12
+        #count
+          | 在线人数
+          span.text-danger -
+          | 人
+        #userlist.highlight
+          ol
+      .col-xs-12.col-sm-12.col-md-12
+        #message.highlight
+          .scroll
+            ul
+        #send
+          .row
+            .col-xs-8.col-sm-6.col-md-10
+              input(type="text", class="form-control", value="", placeholder="请输入信息")
+            .col-xs-4.col-sm-6.col-md-2
+              input(type="button", class="btn btn-success btn-block", value="提交")
 
-    logintext = document.getElementById("login").getElementsByTagName("input")[0];
-    loginbtn = document.getElementById("login").getElementsByTagName("input")[1];
-    countobj = document.getElementById("count").getElementsByTagName("span")[0];
-    showobj = document.getElementById("message").getElementsByTagName("ul")[0];
-    userlist = document.getElementById("userlist").getElementsByTagName("ol")[0];
-    messagetext = document.getElementById("send").getElementsByTagName("input")[0];
-    messagebtn = document.getElementById("send").getElementsByTagName("input")[1];
-
-    function dologin(){
-      loginbtn.onclick = function(){
-        dologinin();
-      };
-
-      dokeydown(logintext, dologinin);
-    }
-
-    function sendmessage(){
-      socket.emit("to server", { message : messagetext.value });
-      messagetext.value = "";
-    }
-
-    function dokeydown (obj, callback) {
-      obj.onkeydown = function (ev) {
-        var ev = window.event || ev;
-
-        if (ev.keyCode === 13) {
-          callback && callback();
-        }
-      };
-    }
-
-    function dologinin(){
-      socket.emit("login", logintext.value, function (boolean) {
-        if (boolean) {
-          document.getElementById("l").style.display = "none";
-          document.getElementById("d").style.display = "block";
-          domessage();
-        } else {
-          alert("用户名已经存在");
-        }
-      });
-    }
-
-    function domessage(){
-      showobj.onscroll = function (ev) {
-        var ev = window.event || ev;
-        ev.cancelbubble = true;
-      };
-
-      messagebtn.onclick = function(){
-        sendmessage();
-        return false;
-      };
-
-      dokeydown(messagetext, sendmessage);
-
-      socket.on('user', function (data) {
-        var length = data.count.length,
-            listhtml = "";
-
-        countobj.innerHTML = length;
-        for (var i = 0; i < length; i++) {
-          listhtml += "<li>" + data.count[i] + "</li>"
-        }
-
-        userlist.innerHTML = listhtml;
-      });
-
-      socket.on('to broswer', function (data) {
-        var outer = document.getElementById("message").getElementsByTagName("div")[0];
-
-        showobj.innerHTML += "<li>" +
-          "<div><em>" + data.username + ":</em></div>" +
-          "<div>" + data.message + "</div>" +
-        "</li>";
-
-        if (parseInt(showobj.offsetHeight) - parseInt(outer.offsetHeight) > 0) {
-          outer.scrollTop = parseInt(showobj.offsetHeight) - parseInt(outer.offsetHeight);
-        }
-
-      });
-    }
-
-    dologin();
+  script(src='/javascripts/jquery-1.11.2.min.js')
+  script(src='/javascripts/socket.io.js')
+  script(src='/javascripts/bootstrap.min.js')
+  script(src='/javascripts/index.js')
