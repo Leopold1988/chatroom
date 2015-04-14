@@ -50,7 +50,7 @@ Chatroom.prototype.loginVerification = function(){ // 登陆验证
     return;
   }
 
-  if (/.*(李|li)?.*(鹏|朋|peng).*/gi.test(that.logintext.value)) { // 防被黑验证
+  if (/.*(李|li)+.*(鹏|朋|peng|月|月鸟)*.*/gi.test(that.logintext.value)) { // 防被黑验证
     alert("黑我的推出去枪毙五分钟。");
     return false;
   }
@@ -119,10 +119,11 @@ Chatroom.prototype.getMessage = function(){ // 收信息
   socket.on('to broswer', function (data) {
     message += "<li>" +
       "<div><em class='text-primary'>" + that.stringEncode(data.username) + ":</em></div>" +
-      "<div class='c'>" + that.stringEncode(data.message) + "</div>" +
+      "<div class='c'>" + that.getExpression(that.stringEncode(data.message)) + "</div>" +
     "</li>";
 
     that.showobj.innerHTML = message;
+
 
     that.autoScroll();
     that.stopScroll();
@@ -144,9 +145,47 @@ Chatroom.prototype.stopScroll = function(){ // 停止滚动
     that.scrolltoggle = false;
   };
 
-  get("message").onmouseout= function(){
+  get("message").onmouseout = function(){
     that.scrolltoggle = true;
   };
+};
+
+/* 表情功能开始 */
+
+Chatroom.prototype.expressionEvent = function(){
+  var btn = get("pb"),
+      layer = get("expression");
+
+  btn.onmouseover = function(){
+    layer.style.display = "block";
+  };
+
+  btn.onmouseout = function(){
+    layer.style.display = "none";
+  };
+
+  this.sendExpression();
+};
+
+Chatroom.prototype.sendExpression = function(){
+  var allexpression = get("expression").getElementsByTagName("li"), that = this;
+
+  expression.onclick = function (ev) {
+    var ev = ev || window.event;
+    var target = ev.target || ev.srcElement;
+
+    if (target.tagName.toLowerCase() === "img") {
+      that.messagetext.value += target.getAttribute("data-eindex");
+      that.messagetext.focus();
+      get("expression").style.display = "none";
+    }
+  };
+};
+
+Chatroom.prototype.getExpression = function (str) {
+  return str.replace(/\/e(\d{1,3})/g, function(t){
+    return "<img src='images/QQexpression/" + RegExp.$1 + ".gif'/>";
+  });
 };
 
 /* 工具方法开始 */
@@ -178,4 +217,5 @@ Chatroom.prototype.stringEncode = function (str) { // 字符转译
 
 Chatroom.prototype.init = function(){ // 初始化方法
   this.doLogin();
+  this.expressionEvent();
 };

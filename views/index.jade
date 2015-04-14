@@ -3,7 +3,7 @@ extends layout
 block content
   .container
     .row
-      .col-xs-12.col-sm-12.col-md-12
+      .col-md-12
           #l
             .jumbotron
               h1 欢迎来到XXX聊天室
@@ -12,22 +12,30 @@ block content
               input(type="text", value="", placeholder="请输入昵称")
               input(type="button", value="使用")
     .row.main#d
-      .col-xs-12.col-sm-12.col-md-12
+      .col-md-12
         #count
           | 在线人数
           span.text-danger -
           | 人
         #userlist.highlight
           ol
-      .col-xs-12.col-sm-12.col-md-12
+      .col-md-12
         #message.highlight
           .scroll
             ul
         #send
           .row
-            .col-xs-8.col-sm-6.col-md-10
+            .col-md-10
               input(type="text", class="form-control", value="", placeholder="请输入信息")
-            .col-xs-4.col-sm-6.col-md-2
+            .col-md-1#pb
+              button.btn.btn-default.btn-block(type='button')
+                span.glyphicon.glyphicon-plus
+              .expression#expression
+                ul
+                  - for (var i = 1; i <= 100; i++)
+                    li
+                      img(src="images/QQexpression/#{i}.gif", data-eindex="/e#{i}")
+            .col-md-1
               input(type="button", class="btn btn-success btn-block", value="提交")
 
   script(src='/javascripts/jquery-1.11.2.min.js')
