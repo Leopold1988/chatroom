@@ -21,6 +21,7 @@ function Chatroom(){
   this.userlist = get("userlist","ol0");
   this.messagetext = get("send","input0");
   this.messagebtn = get("send","input1");
+  this.scrolltoggle = true;
 }
 
 /* 登陆功能开始 */
@@ -124,16 +125,29 @@ Chatroom.prototype.getMessage = function(){ // 收信息
     that.showobj.innerHTML = message;
 
     that.autoScroll();
+    that.stopScroll();
   });
 };
 
 Chatroom.prototype.autoScroll = function(){ // 自动滚动功能
   var outer = get("message", "div0"), that = this;
 
-  if (parseInt(that.showobj.offsetHeight) - parseInt(outer.offsetHeight) > 0) { // 聊天内容区域 > 限制区域
+  if (parseInt(that.showobj.offsetHeight) - parseInt(outer.offsetHeight) > 0 && this.scrolltoggle) { // 聊天内容区域 > 限制区域
     outer.scrollTop = parseInt(that.showobj.offsetHeight) - parseInt(outer.offsetHeight);
   }
 }
+
+Chatroom.prototype.stopScroll = function(){ // 停止滚动
+  var that = this;
+
+  get("message").onmouseover = function(){
+    that.scrolltoggle = false;
+  };
+
+  get("message").onmouseout= function(){
+    that.scrolltoggle = true;
+  };
+};
 
 /* 工具方法开始 */
 
