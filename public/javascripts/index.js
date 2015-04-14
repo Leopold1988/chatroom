@@ -1,106 +1,149 @@
 var socket = io.connect('http://' + window.location.hostname + ':3000');
-var countobj, showobj, logintext, userlist, loginbtn, messagetext, messagebtn;
 
-logintext = document.getElementById("login").getElementsByTagName("input")[0];
-loginbtn = document.getElementById("login").getElementsByTagName("input")[1];
-countobj = document.getElementById("count").getElementsByTagName("span")[0];
-showobj = document.getElementById("message").getElementsByTagName("ul")[0];
-userlist = document.getElementById("userlist").getElementsByTagName("ol")[0];
-messagetext = document.getElementById("send").getElementsByTagName("input")[0];
-messagebtn = document.getElementById("send").getElementsByTagName("input")[1];
+function get (id, tag) {
+  if (tag) {
+    var tagname, tagindex;
+    /([a-z]+)(\d+)/.test(tag);
+    tagname = RegExp.$1;
+    tagindex = Number(RegExp.$2);
 
-function dologin(){
-  loginbtn.onclick = function(){
-    dologinin();
-  };
-
-  dokeydown(logintext, dologinin);
-}
-
-function sendmessage(){
-  if (messagetext.value.replace(/^\s+|\s+$/, "") === ""){
-    return;
+    return document.getElementById(id).getElementsByTagName(tagname)[tagindex];
+  } else {
+    return document.getElementById(id);
   }
-  socket.emit("to server", { message : messagetext.value });
-  messagetext.value = "";
 }
 
-function dokeydown (obj, callback) {
-  obj.onkeydown = function (ev) {
-    var ev = window.event || ev;
+function Chatroom(){
+  this.logintext = get("login","input0");
+  this.loginbtn = get("login","input1");
+  this.countobj = get("count","span0");
+  this.showobj = get("message","ul0");
+  this.userlist = get("userlist","ol0");
+  this.messagetext = get("send","input0");
+  this.messagebtn = get("send","input1");
+}
 
-    if (ev.keyCode === 13) {
-      callback && callback();
-    }
+/* 登陆功能开始 */
+
+Chatroom.prototype.doLogin = function(){ // 登陆
+  var that = this;
+
+  that.loginbtn.onclick = function(){ // 点击登陆按钮
+    that.loginVerification();
   };
-}
 
-function dologinin(){
-  if (logintext.value.replace(/^\s+|\s+$/, "") === "") {
+  that.doKeydown(that.logintext, that.loginVerification); // 回车提交
+};
+
+Chatroom.prototype.loginVerification = function(){ // 登陆验证
+  var that = this;
+
+  if (that.logintext.value.replace(/^\s+|\s+$/, "") === "") { // 空名字验证
     alert("用户名不嫩为空");
-    logintext.value = "";
+    that.logintext.value = "";
     return;
   }
 
-  if (logintext.value.length >= 8) {
+  if (that.logintext.value.length >= 8) { // 大于8位名字验证
     alert("此名太长太拉轰，名字长度应为1~8个字符。");
     return;
   }
 
-  if (/.*(李|li)?.*(鹏|朋|peng).*/gi.test(logintext.value)) {
+  if (/.*(李|li)?.*(鹏|朋|peng).*/gi.test(that.logintext.value)) { // 防被黑验证
     alert("黑我的推出去枪毙五分钟。");
     return false;
   }
 
-  socket.emit("login", logintext.value, function (boolean) {
+  socket.emit("login", that.logintext.value, function (boolean) { // 防止重名验证
     if (boolean) {
-      document.getElementById("l").style.display = "none";
-      document.getElementById("d").style.display = "block";
-      domessage();
+      get("l").style.display = "none";
+      get("d").style.display = "block";
+      that.loadUser();
+      that.doMessage();
     } else {
       alert("用户名已经存在");
     }
   });
-}
+};
 
-function domessage(){
-  showobj.onscroll = function (ev) {
-    var ev = window.event || ev;
-    ev.cancelbubble = true;
-  };
+/* 用户系统开始 */
 
-  messagebtn.onclick = function(){
-    sendmessage();
-    return false;
-  };
-
-  dokeydown(messagetext, sendmessage);
+Chatroom.prototype.loadUser = function(){ // 载入用户
+  var that = this;
 
   socket.on('user', function (data) {
     var length = data.count.length,
         listhtml = "";
 
-    countobj.innerHTML = length;
+    that.countobj.innerHTML = length; // 载入在线人数
+
     for (var i = 0; i < length; i++) {
       listhtml += "<li>" + data.count[i] + "</li>"
     }
 
-    userlist.innerHTML = listhtml;
+    that.userlist.innerHTML = listhtml; // 载入用户列表
   });
+};
+
+/* 聊天系统开始 */
+
+Chatroom.prototype.doMessage = function(){ // 聊天
+  var that = this;
+
+  that.messagebtn.onclick = function(){
+    that.sendMessage();
+    return false;
+  };
+
+  that.doKeydown(that.messagetext, that.sendMessage);
+  that.getMessage();
+};
+
+Chatroom.prototype.sendMessage = function(){ // 发信息
+  var that = this;
+
+  if (that.messagetext.value.replace(/^\s+|\s+$/, "") === ""){ // 发送信息为空的验证
+    return;
+  }
+
+  socket.emit("to server", { message : that.messagetext.value });
+  that.messagetext.value = ""; // 发送完清空信息
+};
+
+Chatroom.prototype.getMessage = function(){ // 收信息
+  var that = this;
 
   socket.on('to broswer', function (data) {
-    var outer = document.getElementById("message").getElementsByTagName("div")[0];
-
-    showobj.innerHTML += "<li>" +
+    that.showobj.innerHTML += "<li>" +
       "<div><em class='text-primary'>" + data.username + ":</em></div>" +
       "<div>" + data.message + "</div>" +
     "</li>";
 
-    if (parseInt(showobj.offsetHeight) - parseInt(outer.offsetHeight) > 0) {
-      outer.scrollTop = parseInt(showobj.offsetHeight) - parseInt(outer.offsetHeight);
-    }
-
+    that.autoScroll();
   });
+};
+
+Chatroom.prototype.autoScroll = function(){ // 自动滚动功能
+  var outer = get("message", "div0"), that = this;
+
+  if (parseInt(that.showobj.offsetHeight) - parseInt(outer.offsetHeight) > 0) { // 聊天内容区域 > 限制区域
+    outer.scrollTop = parseInt(that.showobj.offsetHeight) - parseInt(outer.offsetHeight);
+  }
+}
+/* 工具方法开始 */
+
+Chatroom.prototype.doKeydown = function (obj, callback) { // 键盘按下
+  var that = this;
+
+  obj.onkeydown = function (ev) {
+    var ev = window.event || ev;
+
+    if (ev.keyCode === 13) {
+      callback && callback.call(that);
+    }
+  };
 }
 
-dologin();
+Chatroom.prototype.init = function(){ // 初始化方法
+  this.doLogin();
+};

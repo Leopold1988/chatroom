@@ -6,7 +6,7 @@ block content
       .col-xs-12.col-sm-12.col-md-12
           #l
             .jumbotron
-              h1 欢迎XXX聊天室
+              h1 欢迎来到XXX聊天室
               p 这是一个测试中的聊天室。
             #login
               input(type="text", value="", placeholder="请输入昵称")
@@ -34,3 +34,6 @@ block content
   script(src='/javascripts/socket.io.js')
   script(src='/javascripts/bootstrap.min.js')
   script(src='/javascripts/index.js')
+  script.
+    var chatroom1 = new Chatroom();
+    chatroom1.init();
