@@ -78,7 +78,7 @@ Chatroom.prototype.loadUser = function(){ // 载入用户
     that.countobj.innerHTML = length; // 载入在线人数
 
     for (var i = 0; i < length; i++) {
-      listhtml += "<li>" + data.count[i] + "</li>"
+      listhtml += "<li>" + that.stringEncode(data.count[i]) + "</li>"
     }
 
     that.userlist.innerHTML = listhtml; // 载入用户列表
@@ -97,6 +97,8 @@ Chatroom.prototype.doMessage = function(){ // 聊天
 
   that.doKeydown(that.messagetext, that.sendMessage);
   that.getMessage();
+
+  that.showobj.style.width = parseInt(get("message", "div0").offsetWidth) + "px";
 };
 
 Chatroom.prototype.sendMessage = function(){ // 发信息
@@ -111,13 +113,15 @@ Chatroom.prototype.sendMessage = function(){ // 发信息
 };
 
 Chatroom.prototype.getMessage = function(){ // 收信息
-  var that = this;
+  var that = this, message = "";
 
   socket.on('to broswer', function (data) {
-    that.showobj.innerHTML += "<li>" +
-      "<div><em class='text-primary'>" + data.username + ":</em></div>" +
-      "<div>" + data.message + "</div>" +
+    message += "<li>" +
+      "<div><em class='text-primary'>" + that.stringEncode(data.username) + ":</em></div>" +
+      "<div class='c'>" + that.stringEncode(data.message) + "</div>" +
     "</li>";
+
+    that.showobj.innerHTML = message;
 
     that.autoScroll();
   });
@@ -130,6 +134,7 @@ Chatroom.prototype.autoScroll = function(){ // 自动滚动功能
     outer.scrollTop = parseInt(that.showobj.offsetHeight) - parseInt(outer.offsetHeight);
   }
 }
+
 /* 工具方法开始 */
 
 Chatroom.prototype.doKeydown = function (obj, callback) { // 键盘按下
@@ -142,6 +147,19 @@ Chatroom.prototype.doKeydown = function (obj, callback) { // 键盘按下
       callback && callback.call(that);
     }
   };
+}
+
+
+Chatroom.prototype.stringEncode = function (str) { // 字符转译
+  var div = document.createElement('div');
+
+  if (div.innerText) {
+    div.innerText = str;
+  } else {
+    div.textContent = str;//Support firefox
+  }
+
+  return div.innerHTML;
 }
 
 Chatroom.prototype.init = function(){ // 初始化方法

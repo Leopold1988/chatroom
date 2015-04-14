@@ -76,6 +76,14 @@ a {
   overflow: auto;
 }
 
+#message .scroll ul {
+  overflow: hidden;
+}
+
+#message .scroll ul li {
+  word-break: break-all;
+}
+
 #userlist{
   height: 40px;
   padding: 10px;
