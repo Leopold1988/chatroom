@@ -1,19 +1,19 @@
 var socket = io.connect('http://' + window.location.hostname + ':3000');
 
-function get (id, tag) {
-  if (tag) {
-    var tagname, tagindex;
-    /([a-z]+)(\d+)/.test(tag);
-    tagname = RegExp.$1;
-    tagindex = Number(RegExp.$2);
-
-    return document.getElementById(id).getElementsByTagName(tagname)[tagindex];
-  } else {
-    return document.getElementById(id);
-  }
-}
-
 (function(){
+  function get (id, tag) {
+    if (tag) {
+      var tagname, tagindex;
+      /([a-z]+)(\d+)/.test(tag);
+      tagname = RegExp.$1;
+      tagindex = Number(RegExp.$2);
+
+      return document.getElementById(id).getElementsByTagName(tagname)[tagindex];
+    } else {
+      return document.getElementById(id);
+    }
+  }
+
   function Chatroom(){
     this.logintext = get("login","input0");
     this.loginbtn = get("login","input1");
@@ -62,6 +62,7 @@ function get (id, tag) {
         get("d").style.display = "block";
         that.loadUser();
         that.doMessage();
+        Chatroom.prototype.myname = that.logintext.value;
       } else {
         alert("用户名已经存在");
       }
@@ -80,7 +81,11 @@ function get (id, tag) {
       that.countobj.innerHTML = length; // 载入在线人数
 
       for (var i = 0; i < length; i++) {
-        listhtml += "<li>" + that.stringEncode(data.count[i]) + "</li>"
+        if (Chatroom.prototype.myname === that.stringEncode(data.count[i])) {
+          listhtml += "<li class='text-success'>" + that.stringEncode(data.count[i]) + "</li>"
+        } else {
+          listhtml += "<li>" + that.stringEncode(data.count[i]) + "</li>"
+        }
       }
 
       that.userlist.innerHTML = listhtml; // 载入用户列表
@@ -100,7 +105,7 @@ function get (id, tag) {
     that.doKeydown(that.messagetext, that.sendMessage);
     that.getMessage();
 
-    that.showobj.style.width = parseInt(get("message", "div0").offsetWidth) + "px";
+    that.showobj.style.width = parseInt(get("message", "div0").offsetWidth) - 20 + "px";
   };
 
   Chatroom.prototype.sendMessage = function(){ // 发信息
@@ -115,16 +120,25 @@ function get (id, tag) {
   };
 
   Chatroom.prototype.getMessage = function(){ // 收信息
-    var that = this, message = "";
+    var that = this, message = "", time = "", date = "";
 
     socket.on('to broswer', function (data) {
-      message += "<li>" +
-        "<div><em class='text-primary'>" + that.stringEncode(data.username) + ":</em></div>" +
-        "<div class='c'>" + that.getExpression(that.stringEncode(data.message)) + "</div>" +
-      "</li>";
+      date = new Date(parseInt(data.date)).toLocaleDateString();
+      time = new Date(parseInt(data.date)).toString().match(/\d+:\d+:\d+/);
+
+      if (Chatroom.prototype.myname === that.stringEncode(data.username)) {
+        message += "<li>" +
+          "<div><em class='text-success'>" + that.stringEncode(data.username) + " (" + date + " " + time + "):</em></div>" +
+          "<div class='c'>" + that.getExpression(that.stringEncode(data.message)) + "</div>" +
+        "</li>";
+      } else {
+        message += "<li>" +
+          "<div><em>" + that.stringEncode(data.username) + "(" + date + " " + time + "):</em></div>" +
+          "<div class='c'>" + that.getExpression(that.stringEncode(data.message)) + "</div>" +
+        "</li>";
+      }
 
       that.showobj.innerHTML = message;
-
 
       that.autoScroll();
       that.stopScroll();
@@ -215,6 +229,11 @@ function get (id, tag) {
 
     return div.innerHTML;
   }
+
+  // Chatroom.prototype.unix_to_datetime = function (unix) { // 时间戳转日期
+  //   var now = new Date(parseInt(unix) * 1000);
+  //   return now.toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
+  // };
 
   Chatroom.prototype.init = function(){ // 初始化方法
     this.doLogin();

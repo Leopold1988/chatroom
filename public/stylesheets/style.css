@@ -11,7 +11,6 @@ body,html{
 
 ul, ol{
   margin: 0;
-  padding: 10px;
 }
 
 ul li{
@@ -91,6 +90,7 @@ ul li em{
 
 #message .scroll ul {
   overflow: hidden;
+  padding: 10px;
 }
 
 #message .scroll ul li {
@@ -98,17 +98,20 @@ ul li em{
 }
 
 #userlist{
-  height: 40px;
-  padding: 10px;
+  height: 42px;
+  padding: 0px;
   width: 100%;
   overflow: auto;
 }
 
 #userlist ol{
-  padding: 0;
+  padding: 0 10px;
+  overflow: hidden;
 }
 
 #userlist ol li{
+  height: 40px;
+  line-height: 40px;
   float: left;
   _display: inline;
   margin-right: 10px;

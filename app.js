@@ -127,8 +127,8 @@ io.sockets.on('connection', function (socket) {
     socket.broadcast.emit('user', { 'count' : username });
 
     socket.on("to server", function (data) {
-      socket.emit("to broswer", { username : socket.username, message : data.message });
-      socket.broadcast.emit("to broswer", { username : socket.username, message : data.message });
+      socket.emit("to broswer", { username : socket.username, message : data.message ,date : new Date().getTime()});
+      socket.broadcast.emit("to broswer", { username : socket.username, message : data.message ,date : new Date().getTime()});
     });
   });
 
