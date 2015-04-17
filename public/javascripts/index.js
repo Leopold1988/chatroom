@@ -133,7 +133,7 @@ var socket = io.connect('http://' + window.location.hostname + ':3000');
         "</li>";
       } else {
         message += "<li>" +
-          "<div><em>" + that.stringEncode(data.username) + "(" + date + " " + time + "):</em></div>" +
+          "<div><em>" + that.stringEncode(data.username) + " (" + date + " " + time + "):</em></div>" +
           "<div class='c'>" + that.getExpression(that.stringEncode(data.message)) + "</div>" +
         "</li>";
       }

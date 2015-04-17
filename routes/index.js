@@ -7,14 +7,14 @@ var router = express.Router();
 // });
 
 router.get('/', function (req, res) {
-    var user = {
-        first_name : 'Barak',
-        surname : 'Obama',
-        address : 'The White House'
-    };
+  var user = {
+    first_name : 'Barak',
+    surname : 'Obama',
+    address : 'The White House'
+  };
 
-    res.set('Cache-Control', 'no-store');
-    res.render('index.jade', { title : 'User', user : user });
+  res.set('Cache-Control', 'no-store');
+  res.render('index.jade', { title : 'User', user : user });
 });
 
 module.exports = router;
