@@ -13,7 +13,14 @@ router.get('/', function (req, res) {
     address : 'The White House'
   };
 
-  res.set('Cache-Control', 'no-store');
+  console.log(req.method);
+  console.log(req.headers);
+
+  res.set({
+    'Cache-Control': 'no-store',
+    'ETag': '12345'
+  });
+
   res.render('index.jade', { title : 'User', user : user });
 });
 

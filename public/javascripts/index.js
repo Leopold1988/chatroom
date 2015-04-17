@@ -120,21 +120,25 @@ var socket = io.connect('http://' + window.location.hostname + ':3000');
   };
 
   Chatroom.prototype.getMessage = function(){ // 收信息
-    var that = this, message = "", time = "", date = "";
+    var that = this, message = "", time = "", date = "", infor = "", name = "";
 
     socket.on('to broswer', function (data) {
       date = new Date(parseInt(data.date)).toLocaleDateString();
       time = new Date(parseInt(data.date)).toString().match(/\d+:\d+:\d+/);
+      name = that.stringEncode(data.username);
+      infor = that.stringEncode(data.message);
+      infor = that.getExpression(infor);
+      infor = that.addLink(infor);
 
-      if (Chatroom.prototype.myname === that.stringEncode(data.username)) {
+      if (Chatroom.prototype.myname === name) {
         message += "<li>" +
-          "<div><em class='text-success'>" + that.stringEncode(data.username) + " (" + date + " " + time + "):</em></div>" +
-          "<div class='c'>" + that.getExpression(that.stringEncode(data.message)) + "</div>" +
+          "<div><em class='text-success'>" + name + " (" + date + " " + time + "):</em></div>" +
+          "<div class='c'>" + infor + "</div>" +
         "</li>";
       } else {
         message += "<li>" +
-          "<div><em>" + that.stringEncode(data.username) + " (" + date + " " + time + "):</em></div>" +
-          "<div class='c'>" + that.getExpression(that.stringEncode(data.message)) + "</div>" +
+          "<div><em>" + name + " (" + date + " " + time + "):</em></div>" +
+          "<div class='c'>" + infor + "</div>" +
         "</li>";
       }
 
@@ -182,7 +186,7 @@ var socket = io.connect('http://' + window.location.hostname + ':3000');
     this.sendExpression();
   };
 
-  Chatroom.prototype.sendExpression = function(){
+  Chatroom.prototype.sendExpression = function(){ // 发送表情代号
     var allexpression = get("expression").getElementsByTagName("li"), that = this;
 
     expression.onclick = function (ev) {
@@ -197,10 +201,25 @@ var socket = io.connect('http://' + window.location.hostname + ':3000');
     };
   };
 
-  Chatroom.prototype.getExpression = function (str) {
+  Chatroom.prototype.getExpression = function (str) { // 代号转换成表情
     return str.replace(/\/e(\d{1,3})/g, function(t){
       return "<img src='images/QQexpression/" + RegExp.$1 + ".gif'/>";
     });
+  };
+
+  /* 添加连接 */
+
+  Chatroom.prototype.addLink = function (str) {
+    var reg = /[a-zA-z]+:\/\/[^s]*/; // 例：http://www.baidu.com
+    var reg2 = /[w]{3}\.[^s]*\.[^s]*/; // www.baidu.com
+
+    if (reg.test(str)) {
+      return '<a href="' + str + '" target="_blank">' + str + '</a>';
+    } else if (reg2.test(str)) {
+      return '<a href="http://' + str + '" target="_blank">' + str + '</a>';
+    } else {
+      return str;
+    }
   };
 
   /* 工具方法开始 */
