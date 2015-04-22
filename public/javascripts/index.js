@@ -75,16 +75,16 @@ var socket = io.connect('http://' + window.location.hostname + ':3000');
     var that = this;
 
     socket.on('user', function (data) {
-      var length = data.count.length,
+      var length = data.namelist.length,
           listhtml = "";
 
       that.countobj.innerHTML = length; // 载入在线人数
 
       for (var i = 0; i < length; i++) {
-        if (Chatroom.prototype.myname === that.stringEncode(data.count[i])) {
-          listhtml += "<li class='text-success'>" + that.stringEncode(data.count[i]) + "</li>"
+        if (Chatroom.prototype.myname === that.stringEncode(data.namelist[i])) {
+          listhtml += "<li class='text-success'>" + that.stringEncode(data.namelist[i]) + "</li>"
         } else {
-          listhtml += "<li>" + that.stringEncode(data.count[i]) + "</li>"
+          listhtml += "<li>" + that.stringEncode(data.namelist[i]) + "</li>"
         }
       }
 

@@ -13,15 +13,13 @@ router.get('/', function (req, res) {
     address : 'The White House'
   };
 
-  console.log(req.method);
-  console.log(req.headers);
+  var uajson = require('../module/ua.js')(req.headers["user-agent"]);
 
-  res.set({
-    'Cache-Control': 'no-store',
-    'ETag': '12345'
-  });
-
-  res.render('index.jade', { title : 'User', user : user });
+  if (Number(uajson.VERSION) < 9 && uajson.IE) {
+    res.send("由于使用websocket和css3故暂不支持IE浏览器，如使用双核浏览器请切换至webkit内核。");
+  } else {
+    res.render('index.jade', { title : 'User', user : user });
+  }
 });
 
 module.exports = router;

@@ -13,6 +13,7 @@ var fs = require('fs');
 var app = express();
 
 app.set('port', process.env.PORT || 3000);
+app.set('trust proxy', 'loopback'); // specify a subnet and an address
 // 设置程序所用的views文件夹，即模板文件夹。__dirname代表当前执行js所在的文件夹路径。另外，__filename代表当前执行文件的文件名
 app.set('views', path.join(__dirname, 'views'));
 
@@ -58,16 +59,7 @@ app.use('/users', users);
 //   }
 // });
 
-// var mongoose = require('mongoose');
-// mongoose.connect('mongodb://localhost/test');
 
-// var Cat = mongoose.model('Cat', { name: String });
-
-// var kitty = new Cat({ name: 'Zildjian' });
-// kitty.save(function (err) {
-//   if (err) // ...
-//   console.log('meow');
-// });
 
 
 /// catch 404 and forwarding to error handler
@@ -103,7 +95,6 @@ app.use(function(err, req, res, next) {
 
 var server = app.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
-  console.log(__dirname);
 });
 
 require('./config/socket.js')(server);

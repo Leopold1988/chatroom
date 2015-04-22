@@ -1,36 +1,22 @@
 module.exports = function (server) {
   var io = require('socket.io').listen(server);
-  var count = 0;
-  var username = [];
+  var mongoose = require('../config/mongodb.js');
+
+  var loginModule = require('../Logic/login.js');
+
+  var namelist = [];
 
   io.sockets.on('connection', function (socket) {
-    socket.on("login", function (data, callback) {
-      if (username.indexOf(data) != -1) {
-        callback(false);
-        return;
-      }
 
-      callback(true);
-      username.push(data);
-      socket.username = data;
-
-      count++;
-      socket.emit('user', { 'count' : username });
-      socket.broadcast.emit('user', { 'count' : username });
-
-      socket.on("to server", function (data) {
-        socket.emit("to broswer", { username : socket.username, message : data.message ,date : new Date().getTime()});
-        socket.broadcast.emit("to broswer", { username : socket.username, message : data.message ,date : new Date().getTime()});
+    loginModule(socket, mongoose, namelist, function (namelist, myname) {
+      socket.on('disconnect', function(){
+        if (!myname) return;
+        if (namelist.indexOf(myname) > -1) {
+          namelist.splice(namelist.indexOf(myname), 1);
+          socket.broadcast.emit('user', { 'namelist' : namelist });
+        }
       });
     });
 
-    socket.on('disconnect', function(){
-      if (!socket.username) return;
-      if (username.indexOf(socket.username) > -1) {
-        username.splice(username.indexOf(socket.username), 1);
-        count--;
-        socket.broadcast.emit('user', { 'count' : username });
-      }
-    });
   });
 };
