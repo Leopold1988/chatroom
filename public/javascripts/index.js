@@ -75,16 +75,16 @@ var socket = io.connect('http://' + window.location.hostname + ':3000');
     var that = this;
 
     socket.on('user', function (data) {
-      var length = data.count.length,
+      var length = data.namelist.length,
           listhtml = "";
 
       that.countobj.innerHTML = length; // 载入在线人数
 
       for (var i = 0; i < length; i++) {
-        if (Chatroom.prototype.myname === that.stringEncode(data.count[i])) {
-          listhtml += "<li class='text-success'>" + that.stringEncode(data.count[i]) + "</li>"
+        if (Chatroom.prototype.myname === that.stringEncode(data.namelist[i])) {
+          listhtml += "<li class='text-success'>" + that.stringEncode(data.namelist[i]) + "</li>"
         } else {
-          listhtml += "<li>" + that.stringEncode(data.count[i]) + "</li>"
+          listhtml += "<li>" + that.stringEncode(data.namelist[i]) + "</li>"
         }
       }
 
@@ -102,9 +102,8 @@ var socket = io.connect('http://' + window.location.hostname + ':3000');
       return false;
     };
 
+    that.getHistoryMessage(); // 获取历史消息
     that.doKeydown(that.messagetext, that.sendMessage);
-    that.getMessage();
-
     that.showobj.style.width = parseInt(get("message", "div0").offsetWidth) - 20 + "px";
   };
 
@@ -119,8 +118,33 @@ var socket = io.connect('http://' + window.location.hostname + ':3000');
     that.messagetext.value = ""; // 发送完清空信息
   };
 
-  Chatroom.prototype.getMessage = function(){ // 收信息
+  Chatroom.prototype.getHistoryMessage = function(){ // 获取近20条历史消息
     var that = this, message = "", time = "", date = "", infor = "", name = "";
+
+    socket.on("history message", function (json) {
+      for (var i = 0; i < json.length; i++) {
+        date = new Date(parseInt(json[i].time)).toLocaleDateString();
+        time = new Date(parseInt(json[i].time)).toString().match(/\d+:\d+:\d+/);
+        name = that.stringEncode(json[i].from);
+        infor = that.stringEncode(json[i].content);
+        infor = that.getExpression(infor);
+        infor = that.addLink(infor);
+
+        message += "<li>" +
+          "<div><em>" + name + " (" + date + " " + time + "):</em></div>" +
+          "<div class='c'>" + infor + "</div>" +
+        "</li>";
+      };
+
+      that.showobj.innerHTML = message;
+
+      that.getMessage();
+      that.autoScroll();
+    });
+  };
+
+  Chatroom.prototype.getMessage = function(){ // 收信息
+    var that = this, message = that.showobj.innerHTML, time = "", date = "", infor = "", name = "";
 
     socket.on('to broswer', function (data) {
       date = new Date(parseInt(data.date)).toLocaleDateString();
