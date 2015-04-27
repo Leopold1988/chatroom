@@ -4,26 +4,22 @@ module.exports = function (socket, myname) {
   var mongoose = require('mongoose');
   var db = mongoose.connection;
 
+  var movieSchema = new mongoose.Schema({
+    from: String
+  , to: String
+  , content: String
+  , type: String
+  , time: Date
+  });
+
+  var Movie = mongoose.model('Movie', movieSchema);
+
+  mongoose.connect('mongodb://localhost/abc');
+
+
   socket.on("to server", function (data) {
     now = new Date().getTime();
 
-    // db.on('error', console.error);
-    // db.once('open', function() {
-
-
-    //   // Create your schemas and models here.
-    //   console.log("open success");
-    // });
-
-    var movieSchema = new mongoose.Schema({
-      from: String
-    , to: String
-    , content: String
-    , type: String
-    , time: Date
-    });
-
-    var Movie = mongoose.model('Movie', movieSchema);
     var thor = new Movie({ // 插入数据库
       from: myname,
       to: "all",
@@ -37,17 +33,6 @@ module.exports = function (socket, myname) {
       console.dir(thor);
     });
 
-    mongoose.connect('mongodb://localhost/abc');
-
-
-
-    // mongoose({ // 插入数据库
-    //   from: myname,
-    //   to: "all",
-    //   content: data.message,
-    //   type: "public",
-    //   time: now
-    // }, "message");
 
     socket.emit("to broswer", {  // to me
       username : myname,
