@@ -1,38 +1,36 @@
 module.exports = function (socket, myname) {
-  var now = 0;
+  var messagemodel = require("../module/message.js");
+  var now = 0, datajson = {};
 
-  var mongoose = require('mongoose');
-  var db = mongoose.connection;
-
-  var movieSchema = new mongoose.Schema({
-    from: String
-  , to: String
-  , content: String
-  , type: String
-  , time: Date
+  messagemodel.getmessage(function (Message) {
+    Message.find({}).sort({time : -1}).limit(20).exec(function (err, data) {
+      if (err) {
+        console.error(err)
+      } else {
+        socket.emit("history message", data);
+        socket.broadcast.emit("history message", data);
+      }
+    });
   });
-
-  var Movie = mongoose.model('Movie', movieSchema);
-
-  mongoose.connect('mongodb://localhost/abc');
-
 
   socket.on("to server", function (data) {
     now = new Date().getTime();
 
-    var thor = new Movie({ // 插入数据库
+    datajson = { // 插入数据库
       from: myname,
       to: "all",
       content: data.message,
       type: "public",
       time: now
-    });
+    };
 
-    thor.save(function(err, thor) {
-      if (err) return console.error(err);
-      console.dir(thor);
+    messagemodel.savemessage(datajson, function(err) {
+      if (err) {
+        console.error(err)
+      } else {
+        console.log(datajson);
+      }
     });
-
 
     socket.emit("to broswer", {  // to me
       username : myname,
