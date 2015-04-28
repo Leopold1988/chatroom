@@ -8,6 +8,21 @@ module.exports = function (socket, mongoose, namelist, loginout) {
       return;
     }
 
+    if (data.replace(/^\s+|\s+$/, "") === "") { // 空名字验证
+      callback("用户名不嫩为空");
+      return;
+    }
+
+    if (data.length >= 8) { // 大于8位名字验证
+      callback("此名太长太拉轰，名字长度应为1~8个字符。");
+      return;
+    }
+
+    if (/.*(李|li)+.*(鹏|朋|peng|月|月鸟)*.*/gi.test(data)) { // 防被黑验证
+      callback("黑我的推出去枪毙五分钟。");
+      return;
+    }
+
     callback(true);
     namelist.push(data);
     myname = namelist[namelist.length - 1];

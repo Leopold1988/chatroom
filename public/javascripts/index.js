@@ -56,8 +56,13 @@ var socket = io.connect('http://' + window.location.hostname + ':3000');
       return false;
     }
 
-    socket.emit("login", that.logintext.value, function (boolean) { // 防止重名验证
-      if (boolean) {
+    socket.emit("login", that.logintext.value, function (result) { // 防止重名验证
+      if (typeof(result) === "string" && result.length) {
+        alert(result);
+        return;
+      }
+
+      if (typeof(result) === "boolean" && result) {
         get("l").style.display = "none";
         get("d").style.display = "block";
         that.loadUser();
@@ -65,6 +70,7 @@ var socket = io.connect('http://' + window.location.hostname + ':3000');
         Chatroom.prototype.myname = that.logintext.value;
       } else {
         alert("用户名已经存在");
+        return;
       }
     });
   };
