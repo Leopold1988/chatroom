@@ -128,7 +128,7 @@ var socket = io.connect('http://' + window.location.hostname + ':3000');
     var that = this, message = "", time = "", date = "", infor = "", name = "";
 
     socket.on("history message", function (json) {
-      for (var i = 0; i < json.length; i++) {
+      for (var i = json.length - 1; i >= 0; i--) {
         date = new Date(parseInt(json[i].time)).toLocaleDateString();
         time = new Date(parseInt(json[i].time)).toString().match(/\d+:\d+:\d+/);
         name = that.stringEncode(json[i].from);

@@ -93,6 +93,18 @@ app.use(function(err, req, res, next) {
     });
 });
 
+process.stdin.resume();
+
+process.on('SIGINT', function(){
+    console.log('Ctrl+C关闭进程');
+    process.exit(0);
+});
+
+process.on('SIGTERM', function(){
+    console.log('Kill杀死进程');
+    process.exit(0);
+});
+
 var server = app.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
