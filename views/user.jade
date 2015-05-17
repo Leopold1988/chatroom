@@ -1,0 +1,29 @@
+extends layout
+
+block content
+  link(rel='stylesheet', href='/stylesheets/tag.css')
+  .container
+    .screening
+      .shead
+        strong 
+          span.red 包
+          | 商品筛选
+          span.gray 
+            | (共
+            em#total.red 0
+            |个商品)
+      .smain
+        .selected
+          .title 已筛选:
+          #selected
+            
+        .alltag
+          .title 标签:
+          #tag
+    #show
+      ul
+        
+  script(src='/javascripts/jquery-1.11.2.min.js')
+  script(src='/javascripts/socket.io.js')
+  script(src='/javascripts/bootstrap.min.js')
+  script(src='/javascripts/tag.js')

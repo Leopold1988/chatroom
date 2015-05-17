@@ -15,7 +15,7 @@ router.get('/', function (req, res) {
 
   var uajson = require('../module/ua.js')(req.headers["user-agent"]);
 
-  if (Number(uajson.VERSION) < 9 && uajson.IE) {
+  if (Number(uajson.VERSION) < 9 && uajson.IE && false) {
     res.send("由于使用websocket和css3故暂不支持IE浏览器，如使用双核浏览器请切换至webkit内核。");
   } else {
     var csp = "default-src 'self'; " +
@@ -27,7 +27,9 @@ router.get('/', function (req, res) {
               "font-src 'none'; " +
               "connect-src 'self';";
 
-    res.render('index.jade', { title : 'User', user : user });
+    // res.render('index.jade', { title : 'User', user : user });
+    res.render('user.jade', { title : 'User', user : user });
+
     res.setHeader("Content-Security-Policy", csp);
     res.setHeader("X-Content-Security-Policy", csp);
     res.setHeader("X-WebKit-CSP", csp);
